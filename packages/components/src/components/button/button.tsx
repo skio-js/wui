@@ -1,4 +1,4 @@
-import { defineComponent } from "vue";
+import { defineComponent } from "vue"
 
 export const WButton = defineComponent({
   name: "WButton",

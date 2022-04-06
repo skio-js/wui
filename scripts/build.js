@@ -1,5 +1,7 @@
-const chalk = require("chalk");
-const argv = require('minimist')(process.argv.slice(2))
+const chalk = require("chalk")
+const { buildDts, buildLib } = require("./builders")
+
+const argv = require("minimist")(process.argv.slice(2))
 
 const packages = ["components", "composables"]
 
@@ -17,3 +19,18 @@ ${chalk.red("error:")} ---------- wrong build target ----------
   }
 })
 
+;(async () => {
+  for (const target of argv._) {
+    console.log(`
+    [wui]: build ${chalk.blueBright(target)} start...
+    `)
+    await buildLib(target)
+
+    console.log(`
+    [wui]: generate ${chalk.blueBright(target)} types...
+    `)
+
+    await buildDts(target)
+  }
+
+})()

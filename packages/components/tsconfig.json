@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "types-temp",
+    "paths": {
+      "@wui/composables": ["../composables/src"]
+    }
+  },
+  "include": [
+    "./src/index.ts",
+    "./**/*.ts",
+    "./**/*.tsx"
+  ],
+  "exclude": ["../composables"]
+}

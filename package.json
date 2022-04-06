@@ -1,6 +1,6 @@
 {
   "name": "wui",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite ./playground",
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js",
+    "compile": "node scripts/build.js components composables && rimraf ./packages/**/types-temp"
   },
   "devDependencies": {
     "@types/node": "^17.0.23",
@@ -22,7 +23,11 @@
     "eslint": "^8.12.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "eslint-plugin-vue": "^8.5.0",
+    "execa": "5",
     "minimist": "^1.2.6",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.70.1",
+    "rollup-plugin-dts": "^4.2.0",
     "typescript": "^4.6.3",
     "vite": "^2.9.1",
     "vue": "^3.2.31"
