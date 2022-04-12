@@ -30,7 +30,7 @@ ${chalk.red("error:")} ---------- wrong build target ----------
     [wui]: generate ${chalk.blueBright(target)} types...
     `)
 
-    await buildDts(target)
+    // await buildDts(target)
   }
 
 })()

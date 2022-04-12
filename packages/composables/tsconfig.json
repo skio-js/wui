@@ -1,8 +1,0 @@
-{
-  "extends": "../../tsconfig.json",
-  "include": ["./**/*.ts"],
-  "compilerOptions": {
-    "baseUrl": ".",
-    "outDir": "types-temp/composables/src"
-  }
-}

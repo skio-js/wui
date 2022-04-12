@@ -5,7 +5,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import { WButton } from "../packages/components"
+import { WButton } from "../packages/ui/src/components"
 
 export default defineComponent({
   name: "App",

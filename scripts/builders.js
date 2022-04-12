@@ -6,7 +6,7 @@ const { rollup } = require("rollup")
 const dts = require("rollup-plugin-dts").default
 
 const resolve = (lib) => {
-  return path.join(__dirname, "../packages", lib)
+  return path.join(__dirname, "../packages/ui/src", lib)
 }
 
 exports.buildLib = async function(target) {
@@ -15,12 +15,17 @@ exports.buildLib = async function(target) {
       jsxFactory: "h",
       jsxFragment: "Fragment"
     },
+    resolve: {
+      alias: {
+        "@/": resolve("/")
+      }
+    },
     build: {
       emptyOutDir: false,
       lib: {
-        entry: resolve(`${target}/src/index.ts`),
+        entry: resolve(`${target}/index.ts`),
         formats: ["es"],
-        fileName: (format) => `${target}/index.${format}.js`
+        fileName: () => `${target}/index.js`
       },
       rollupOptions: {
         external: ["vue", "@wui/composables"]
