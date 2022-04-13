@@ -1,36 +1,90 @@
+const fs = require("fs")
 const chalk = require("chalk")
-const { buildDts, buildLib } = require("./builders")
+const path = require("path")
+const { build } = require("vite")
+const execa = require("execa")
+const { rollup } = require("rollup")
+const { default: dts } = require("rollup-plugin-dts")
 
 const argv = require("minimist")(process.argv.slice(2))
 
-const packages = ["components", "composables"]
+const external = ["vue", "@wui/composables", "@wui/styles"]
 
-argv._.forEach((target) => {
-  if (!packages.includes(target)) {
+const resolve = (file) => path.resolve(__dirname, "../packages", file)
 
-    console.log(`
-${chalk.red("error:")} ---------- wrong build target ----------
+const wui = () => chalk.greenBright("[wui]:")
+const t = (target) => chalk.blueBright(target)
 
-       target ${chalk.red(target)} is not included!
-       we just provide ${chalk.blueBright(packages)}
-`)
-
-    process.exit(0)
-  }
-})
-
+//
 ;(async () => {
   for (const target of argv._) {
-    console.log(`
-    [wui]: build ${chalk.blueBright(target)} start...
-    `)
-    await buildLib(target)
+    if (fs.existsSync(resolve(target))) {
+      switch (target) {
+        case "components":
+          break
+        default:
+          console.group(wui(), t(target))
 
-    console.log(`
-    [wui]: generate ${chalk.blueBright(target)} types...
-    `)
+          await buildSub(target)
+          await buildDts(target)
 
-    // await buildDts(target)
+          console.groupEnd()
+          console.log()
+          break
+      }
+    }
   }
-
 })()
+
+async function buildSub(target) {
+  return build({
+    root: resolve(target),
+    esbuild: {
+      jsx: "preserve",
+      jsxFactory: "h"
+    },
+    build: {
+      // sourcemap: true,
+      lib: {
+        entry: resolve(`${target}/src/index.ts`),
+        formats: ["es", "umd"],
+        name: `wui${target[0].toUpperCase()}${target.substring(1)}`,
+        fileName: (format) => `${target}/${format}/index.js`
+      },
+      rollupOptions: {
+        external,
+        output: {
+          globals: {
+            vue: "Vue",
+            "@wui/composables": "wuiComposables",
+            "@wui/styles": "wuiStyles"
+          }
+        }
+      }
+    }
+  })
+}
+
+async function buildDts(target) {
+  await execa("tsc",
+    [
+      "--pretty",
+      "--emitDeclarationOnly",
+      "-p", resolve(`${target}/tsconfig.json`)
+    ],
+    { stdio: "inherit" }
+  )
+
+  const bundle = await rollup({
+    input: resolve(`${target}/types-temp/src/index.d.ts`),
+    external,
+    plugins: [
+      dts()
+    ]
+  })
+  await bundle.write({
+    file: resolve(`${target}/dist/types/index.d.ts`),
+    format: "es"
+  })
+  await bundle.close()
+}

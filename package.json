@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "vite ./playground",
     "build": "node scripts/build.js",
-    "compile": "node scripts/build.js components composables && rimraf ./packages/**/types-temp"
+    "compile": "node scripts/build.js components composables"
   },
   "devDependencies": {
     "@types/node": "^17.0.23",
