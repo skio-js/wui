@@ -1,1 +1,0 @@
-export { WButton } from "./button"
