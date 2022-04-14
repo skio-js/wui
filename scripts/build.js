@@ -1,48 +1,94 @@
 const fs = require("fs")
-const chalk = require("chalk")
 const path = require("path")
 const { build } = require("vite")
 const execa = require("execa")
+const vueJsx = require("@vitejs/plugin-vue-jsx")
 const { rollup } = require("rollup")
 const { default: dts } = require("rollup-plugin-dts")
+const { logGroup } = require("./log")
+const { getComponents } = require("./utils")
 
 const argv = require("minimist")(process.argv.slice(2))
 
 const external = ["vue", "@wui/composables", "@wui/styles"]
+const globals = {
+  vue: "Vue",
+  "@wui/core": "wuiComponents",
+  "@wui/composables": "wuiComposables",
+  "@wui/styles": "wuiStyles"
+}
 
 const resolve = (file) => path.resolve(__dirname, "../packages", file)
 
-const wui = () => chalk.greenBright("[wui]:")
-const t = (target) => chalk.blueBright(target)
+// TODO 删除types-temp； 移动 dist； 写package.json； build components
+
 
 //
 ;(async () => {
   for (const target of argv._) {
     if (fs.existsSync(resolve(target))) {
       switch (target) {
-        case "components":
+        case "core":
+          await logGroup(async () => {
+            await buildComponent()
+          }, "core components")
           break
         default:
-          console.group(wui(), t(target))
 
-          await buildSub(target)
-          await buildDts(target)
+          await logGroup(async () => {
+            await buildSub(target)
+            await buildDts(target)
+          }, target)
 
-          console.groupEnd()
-          console.log()
           break
       }
     }
   }
 })()
 
-async function buildSub(target) {
+async function buildComponent() {
+  const files = getComponents()
+
   return build({
-    root: resolve(target),
+    plugins: [vueJsx()],
+    mode: "development",
+    root: resolve("core"),
     esbuild: {
       jsx: "preserve",
       jsxFactory: "h"
     },
+    resolve: {
+      alias: {
+        "@/": resolve("core/src") + "/"
+      }
+    },
+    build: {
+      minify: false,
+      lib: {
+        entry: resolve("core/src/framework.ts"),
+        formats: ["es", "umd"],
+        name: "wuiComponents",
+        fileName: (format) => `components/${format}/index.js`
+      },
+      rollupOptions: {
+        external,
+        output: {
+          globals
+        }
+        // input: files,
+        // output: {
+        //   format: "es",
+        //   entryFileNames: () => `[name].js`
+        // }
+
+      }
+    }
+  })
+}
+
+async function buildSub(target) {
+  return build({
+    root: resolve(target),
     build: {
       // sourcemap: true,
       lib: {
@@ -54,11 +100,7 @@ async function buildSub(target) {
       rollupOptions: {
         external,
         output: {
-          globals: {
-            vue: "Vue",
-            "@wui/composables": "wuiComposables",
-            "@wui/styles": "wuiStyles"
-          }
+          globals
         }
       }
     }
@@ -88,3 +130,4 @@ async function buildDts(target) {
   })
   await bundle.close()
 }
+
