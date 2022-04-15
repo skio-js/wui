@@ -3,6 +3,7 @@
   "include": ["./src/**/*.ts", "./src/**/*.tsx"],
   "compilerOptions": {
     "outDir": "types-temp",
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@wui/composables": ["../composables"]

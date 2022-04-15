@@ -13,6 +13,7 @@
     "build": "node scripts/build.js",
     "compile": "node scripts/build.js components composables"
   },
+
   "devDependencies": {
     "@types/node": "^17.0.23",
     "@typescript-eslint/eslint-plugin": "^5.18.0",
@@ -24,6 +25,7 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "eslint-plugin-vue": "^8.5.0",
     "execa": "5",
+    "fs-extra": "^10.0.1",
     "minimist": "^1.2.6",
     "rimraf": "^3.0.2",
     "rollup": "^2.70.1",
