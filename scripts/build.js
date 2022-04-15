@@ -30,6 +30,7 @@ const resolve = (file) => path.resolve(__dirname, "../packages", file)
         await logGroup(async () => {
           await buildComponent()
           await tscComponents()
+          await buildComponentsDts()
           writePkgJSON("core")
         }, "core components")
         break
@@ -132,6 +133,18 @@ async function buildSub(target) {
       }
     }
   })
+}
+
+async function buildComponentsDts() {
+   const bundle = await rollup({
+    input: resolve(`core/dist/lib/framework.d.ts`),
+    external,
+    plugins: [dts()]
+  })
+  await bundle.write({
+    file: resolve(`core/dist/es/index.d.ts`), format: "es"
+  })
+  await bundle.close()
 }
 
 async function buildDts(target) {
