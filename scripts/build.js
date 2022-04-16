@@ -26,44 +26,53 @@ const resolve = (file) => path.resolve(__dirname, "../packages", file)
   for (const target of argv._) {
     if (fs.existsSync(resolve(target))) {
       switch (target) {
+        case "icon":
+          await logGroup(async () => {
+            await buildComponent(target, "mdiIcon")
+            await tscComponents(target)
+            await buildDts(target)
+            writePkgJSON(target)
+          }, `${target} components`)
+          break
         case "core":
           await logGroup(async () => {
-            await buildComponent()
-            await tscComponents()
-            await buildComponentsDts()
-            writePkgJSON("core")
-          }, "core components")
+            await buildComponent(target, "wuiComponents")
+            await tscComponents(target)
+            await buildComponentsDts(target)
+            writePkgJSON(target)
+          }, `${target} components`)
           break
         default:
-
           await logGroup(async () => {
             await buildSub(target)
             await buildDts(target)
             writePkgJSON(target)
           }, target)
-
           break
       }
     }
   }
 })()
 
-async function tscComponents() {
-  const temp = resolve("core/dist_temp")
+async function tscComponents(target) {
+  const tsConfig = require(resolve(`${target}/tsconfig.json`))
+  const temp = resolve(`${target}/${tsConfig.compilerOptions.outDir}`)
 
-  console.log(wui(), t("tsc --pretty -p core/tsconfig.json --outDir core/dist_temp"))
+  console.log(wui(), t(`tsc --pretty -p ${target}/tsconfig.json --outDir ${temp}`))
 
   await execa("tsc",
     [
       "--pretty",
       "-p",
-      resolve("core/tsconfig.json"),
+      resolve(`${target}/tsconfig.json`),
       "--outDir",
       temp
     ], { stdio: "inherit" })
 
-  const from = path.resolve(temp, "./core/src")
-  const to = resolve("core/dist/lib")
+  let from = path.resolve(temp, `./${target}/src`)
+  const to = resolve(`${target}/dist/lib`)
+
+  if (!fs.existsSync(from)) from = temp
 
   console.log(wui(), t("from"), from)
   console.log(wui(), t("to  "), to)
@@ -83,25 +92,24 @@ async function tscComponents() {
   }))()
 }
 
-async function buildComponent() {
+async function buildComponent(target, nameForUMD) {
   return build({
     plugins: [vueJsx()],
-    mode: "development",
-    root: resolve("core"),
+    root: resolve(target),
     esbuild: {
       jsx: "preserve",
       jsxFactory: "h"
     },
     resolve: {
       alias: {
-        "@/": resolve("core/src") + "/"
+        "@/": resolve(`${target}/src`) + "/"
       }
     },
     build: {
       lib: {
-        entry: resolve("core/src/framework.ts"),
+        entry: resolve(`${target}/src/index.ts`),
         formats: ["es", "umd"],
-        name: "wuiComponents",
+        name: nameForUMD,
         fileName: (format) => `${format}/index.js`
       },
       rollupOptions: {
@@ -112,6 +120,18 @@ async function buildComponent() {
       }
     }
   })
+}
+
+async function buildComponentsDts(target) {
+  const bundle = await rollup({
+    input: resolve(`${target}/dist/lib/index.d.ts`),
+    external,
+    plugins: [dts()]
+  })
+  await bundle.write({
+    file: resolve(`${target}/dist/types/index.d.ts`), format: "es"
+  })
+  await bundle.close()
 }
 
 async function buildSub(target) {
@@ -135,18 +155,6 @@ async function buildSub(target) {
   })
 }
 
-async function buildComponentsDts() {
-  const bundle = await rollup({
-    input: resolve(`core/dist/lib/framework.d.ts`),
-    external,
-    plugins: [dts()]
-  })
-  await bundle.write({
-    file: resolve(`core/dist/types/index.d.ts`), format: "es"
-  })
-  await bundle.close()
-}
-
 async function buildDts(target) {
   console.log(wui(), t("rolling up types"), `packages/${target} => packages/${target}/types-temp`)
   console.log(wui(), t("types transformed"))
@@ -155,8 +163,7 @@ async function buildDts(target) {
     [
       "--pretty",
       "--emitDeclarationOnly",
-      "-p",
-      resolve(`${target}/tsconfig.json`)
+      "-p", resolve(`${target}/tsconfig.json`)
     ], { stdio: "inherit" })
 
   const bundle = await rollup({

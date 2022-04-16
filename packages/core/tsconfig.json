@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "include": ["./src/**/*.ts", "./src/**/*.tsx"],
   "compilerOptions": {
-    "outDir": "types-temp",
+    "outDir": "dist_temp",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
