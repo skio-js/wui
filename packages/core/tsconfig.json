@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["./src/**/*.ts", "./src/**/*.tsx"],
+  "compilerOptions": {
+    "outDir": "types-temp",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@woodyui/composables": ["../composables"]
+    }
+  }
+}
