@@ -42,10 +42,13 @@ importers:
       vite: 2.9.1
       vue: 3.2.31
 
-  packages/components:
+  packages/composables:
     specifiers: {}
 
-  packages/composables:
+  packages/core:
+    specifiers: {}
+
+  packages/styles:
     specifiers: {}
 
 packages:

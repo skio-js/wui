@@ -11,12 +11,12 @@ const { writePkgJSON } = require("./packageJson")
 
 const argv = require("minimist")(process.argv.slice(2))
 
-const external = ["vue", "@wui/composables", "@wui/styles"]
+const external = ["vue", "@woodyui/composables", "@woodyui/styles"]
 const globals = {
   vue: "Vue",
-  "@wui/core": "wuiComponents",
-  "@wui/composables": "wuiComposables",
-  "@wui/styles": "wuiStyles"
+  "@woodyui/core": "wuiComponents",
+  "@woodyui/composables": "wuiComposables",
+  "@woodyui/styles": "wuiStyles"
 }
 
 const resolve = (file) => path.resolve(__dirname, "../packages", file)
@@ -26,23 +26,23 @@ const resolve = (file) => path.resolve(__dirname, "../packages", file)
   for (const target of argv._) {
     if (fs.existsSync(resolve(target))) {
       switch (target) {
-      case "core":
-        await logGroup(async () => {
-          await buildComponent()
-          await tscComponents()
-          await buildComponentsDts()
-          writePkgJSON("core")
-        }, "core components")
-        break
-      default:
+        case "core":
+          await logGroup(async () => {
+            await buildComponent()
+            await tscComponents()
+            await buildComponentsDts()
+            writePkgJSON("core")
+          }, "core components")
+          break
+        default:
 
-        await logGroup(async () => {
-          await buildSub(target)
-          await buildDts(target)
-          writePkgJSON(target)
-        }, target)
+          await logGroup(async () => {
+            await buildSub(target)
+            await buildDts(target)
+            writePkgJSON(target)
+          }, target)
 
-        break
+          break
       }
     }
   }
@@ -123,7 +123,7 @@ async function buildSub(target) {
         entry: resolve(`${target}/src/index.ts`),
         formats: ["es", "umd"],
         name: `wui${target[0].toUpperCase()}${target.substring(1)}`,
-        fileName: (format) => `${target}/${format}/index.js`
+        fileName: (format) => `${format}/index.js`
       },
       rollupOptions: {
         external,
@@ -136,20 +136,21 @@ async function buildSub(target) {
 }
 
 async function buildComponentsDts() {
-   const bundle = await rollup({
+  const bundle = await rollup({
     input: resolve(`core/dist/lib/framework.d.ts`),
     external,
     plugins: [dts()]
   })
   await bundle.write({
-    file: resolve(`core/dist/es/index.d.ts`), format: "es"
+    file: resolve(`core/dist/types/index.d.ts`), format: "es"
   })
   await bundle.close()
 }
 
 async function buildDts(target) {
   console.log(wui(), t("rolling up types"), `packages/${target} => packages/${target}/types-temp`)
-  console.log(wui(), t("gen dist/types/index.d.ts"))
+  console.log(wui(), t("types transformed"))
+  console.log(success("✓"), gry("dist/types/index.d.ts"))
   await execa("tsc",
     [
       "--pretty",
@@ -167,8 +168,6 @@ async function buildDts(target) {
     file: resolve(`${target}/dist/types/index.d.ts`), format: "es"
   })
   await bundle.close()
-
-  console.log(wui(), t(`remove ${target}/types-temp`))
 
   fsE.removeSync(resolve(`${target}/types-temp`))
 }

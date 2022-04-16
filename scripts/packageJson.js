@@ -5,8 +5,8 @@ const fs = require("fs")
 const peerDeps = {
   core: {
     "vue": pkg.devDependencies.vue,
-    "@wui/composables": "^0.0.1",
-    "@wui/styles": "^0.0.1"
+    "@woodyui/composables": "^0.0.1",
+    "@woodyui/styles": "^0.0.1"
   }
 }
 
@@ -29,13 +29,14 @@ exports.writePkgJSON = (target) => {
     name: _pkg.name,
     version: _pkg.version,
     description: _pkg.description,
+    types: "./types/index.d.ts",
+    module: "./es/index.js",
     peerDependencies: {
       ...peerDeps.core
     }
   }
   switch (target) {
     case "core":
-      tempJson.module = "./es/index.js"
       tempJson.exports = {
         ".": {
           "import": "./es/index.js",

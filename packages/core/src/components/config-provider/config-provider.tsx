@@ -1,7 +1,7 @@
-import type { ThemeMode, ThemeOptions } from "@wui/composables"
+import type { ThemeMode, ThemeOptions } from "@woodyui/composables"
 
 import { defineComponent } from "vue"
-import { createTheme } from "@wui/composables"
+import { createTheme } from "@woodyui/composables"
 
 import { notInComposables } from "@/composables/example"
 
