@@ -2,14 +2,6 @@ const pkg = require("../package.json")
 const path = require("path")
 const fs = require("fs")
 
-const peerDeps = {
-  core: {
-    "vue": pkg.devDependencies.vue,
-    "@woodyui/composables": "^0.0.1",
-    "@woodyui/styles": "^0.0.1"
-  }
-}
-
 const commonJson = {
   "name": "",
   "version": "",
@@ -31,9 +23,7 @@ exports.writePkgJSON = (target) => {
     description: _pkg.description,
     types: "./types/index.d.ts",
     module: "./es/index.js",
-    peerDependencies: {
-      ...peerDeps.core
-    }
+    peerDependencies: _pkg.peerDependencies || {},
   }
   switch (target) {
     case "core":

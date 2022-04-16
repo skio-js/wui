@@ -1,4 +1,9 @@
 {
   "name": "@woodyui/components",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "peerDependencies": {
+    "vue": "^3.2.31",
+    "@woodyui/composables": "^0.0.1",
+    "@woodyui/styles": "^0.0.1"
+  }
 }

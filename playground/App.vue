@@ -1,16 +1,16 @@
 <template>
   <h1>hello vue3</h1>
-  <w-button></w-button>
+  <mdi-icon-demo/>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import { WButton } from "../packages/ui/src/components"
+import MdiIconDemo from "./mdi-icon/mdi-icon.vue"
 
 export default defineComponent({
   name: "App",
   components: {
-    WButton
+    MdiIconDemo
   }
 })
 </script>
