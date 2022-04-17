@@ -47,3 +47,28 @@ export default defineComponent({
 })
 </script>
 ```
+## with props preset
+
+```vue
+<template>
+   <!-- WebStorm has no prop intellisence if you use WithMdiIconProps -->
+   <mdi-preset color="green" />
+</template>
+
+<script lang="ts">
+import { defineComponent, ref } from "vue"
+import { mdiAccountSearch } from "@mdi/js"
+import { WithMdiIconProps } from "@woodyui/mdi-icon"
+
+const MdiPreset = WithMdiIconProps({
+  path: mdiAccountSearch
+})
+
+export default defineComponent({
+  name: "MdiIconDemo",
+  components: {
+    MdiPreset
+  }
+})
+</script>
+```

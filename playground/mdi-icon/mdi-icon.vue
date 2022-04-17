@@ -1,25 +1,19 @@
 <template>
-  <button @click="toggle">color {{ color }}</button>
-  <br />
-  <mdi-icon :path="mdiAccountSearch" :color="color"/>
-<!--  <mdi-home-icon vertical/>-->
+   <mdi-preset color="green" />
 </template>
 <script lang="ts">
 import { defineComponent, ref } from "vue"
-import { MdiIcon } from "../../packages/icon/src"
 import { mdiAccountSearch } from "@mdi/js"
+import { WithMdiIconProps } from "../../packages/icon/src"
 
-// const MdiHomeIcon = WithMdiIconProps({
-//   path: mdiAccountSearch,
-//   color: "pink",
-//   horizontal: true
-// })
+const MdiPreset = WithMdiIconProps({
+  path: mdiAccountSearch
+})
 
 export default defineComponent({
   name: "MdiIconDemo",
   components: {
-    MdiIcon,
-    // MdiHomeIcon
+    MdiPreset
   },
   setup() {
     let index = 0
